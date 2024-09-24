@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:language_app/app/app_string.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,45 +33,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   String _selectedLanguage = 'English';
   final Random _random = Random();
 
   @override
   void initState() {
     super.initState();
-
   }
 
-
-    List<String> allStories = [
-      "Once upon a time, in a faraway land, a young prince was cursed to live as a beast until he learned to love.",
-      "A group of explorers discovered an ancient city hidden beneath the ice of Antarctica.",
-      "A boy found a mysterious key that opened a door to another dimension.",
-      "A scientist accidentally created a potion that made him invisible, but the effects were irreversible.",
-      "During a space mission, an astronaut encountered a strange, glowing object that gave him superpowers.",
-      "A small village in Japan has a forest where it is said people can communicate with spirits.",
-      "In a world where time stops for everyone except for one person, that person becomes the guardian of time.",
-      "A magical library exists where the books write themselves, containing stories of people’s dreams.",
-      "A pirate ship sailing through the Caribbean found a map leading to the legendary lost city of gold.",
-      "A woman wakes up every day with no memory of her past, but she leaves herself clues hidden around the house.",
-    ];
-
-
+  List<String> allStories = [
+    "Once upon a time, in a faraway land, a young prince was cursed to live as a beast until he learned to love.",
+    "A group of explorers discovered an ancient city hidden beneath the ice of Antarctica.",
+    "A boy found a mysterious key that opened a door to another dimension.",
+    "A scientist accidentally created a potion that made him invisible, but the effects were irreversible.",
+    "During a space mission, an astronaut encountered a strange, glowing object that gave him superpowers.",
+    "A small village in Japan has a forest where it is said people can communicate with spirits.",
+    "In a world where time stops for everyone except for one person, that person becomes the guardian of time.",
+    "A magical library exists where the books write themselves, containing stories of people’s dreams.",
+    "A pirate ship sailing through the Caribbean found a map leading to the legendary lost city of gold.",
+    "A woman wakes up every day with no memory of her past, but she leaves herself clues hidden around the house.",
+  ];
 
   void _showLanguageModal() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Select Language'),
+          title: Text(AppString.selectLanguage),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               _languageOption('English'),
-              _languageOption('Spanish'),
-              _languageOption('French'),
-              _languageOption('German'),
+              _languageOption('Español'),
+              _languageOption('Français'),
+              _languageOption('Deutsch'),
             ],
           ),
         );
@@ -109,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Selected Language: $_selectedLanguage',
+              '${AppString.selectLanguage}: $_selectedLanguage',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
@@ -117,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView.builder(
               itemCount: allStories.length,
               itemBuilder: (context, index) {
-                String story =allStories[index];
+                String story = allStories[index];
                 return ListTile(
                   title: Text(story),
                 );
@@ -128,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showLanguageModal,
-        tooltip: 'Select Language',
+        tooltip: AppString.selectLanguage,
         child: const Icon(Icons.language),
       ),
     );
