@@ -1,10 +1,13 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:language_app/app/app_string.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  var delegate = await LocalizationDelegate.create(
+      fallbackLocale: 'en', supportedLocales: ['en', 'es', 'fr', 'de']);
+
+  runApp(LocalizedApp(delegate, const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -12,47 +15,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var localizationDelegate = LocalizedApp.of(context).delegate;
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: AppString.flutterDemo,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Interesting Stories'),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        localizationDelegate
+      ],
+      supportedLocales: localizationDelegate.supportedLocales,
+      locale: localizationDelegate.currentLocale,
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({
+    super.key,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _selectedLanguage = 'English';
-  final Random _random = Random();
+  ValueNotifier<String> langNotifier = ValueNotifier('en');
 
   @override
   void initState() {
     super.initState();
   }
-
-  List<String> allStories = [
-    "Once upon a time, in a faraway land, a young prince was cursed to live as a beast until he learned to love.",
-    "A group of explorers discovered an ancient city hidden beneath the ice of Antarctica.",
-    "A boy found a mysterious key that opened a door to another dimension.",
-    "A scientist accidentally created a potion that made him invisible, but the effects were irreversible.",
-    "During a space mission, an astronaut encountered a strange, glowing object that gave him superpowers.",
-    "A small village in Japan has a forest where it is said people can communicate with spirits.",
-    "In a world where time stops for everyone except for one person, that person becomes the guardian of time.",
-    "A magical library exists where the books write themselves, containing stories of people’s dreams.",
-    "A pirate ship sailing through the Caribbean found a map leading to the legendary lost city of gold.",
-    "A woman wakes up every day with no memory of her past, but she leaves herself clues hidden around the house.",
-  ];
 
   void _showLanguageModal() {
     showDialog(
@@ -78,56 +76,89 @@ class _MyHomePageState extends State<MyHomePage> {
     return RadioListTile<String>(
       title: Text(language),
       value: language,
-      groupValue: _selectedLanguage,
+      groupValue: langNotifier.value,
       onChanged: (String? value) {
-        setState(() {
-          _selectedLanguage = value!;
-        });
+        langNotifier.value = value!;
+        changeLocale(context, getLangString(value));
         Navigator.of(context).pop(); // Close the modal after selection
       },
     );
   }
 
+  String getLangString(String value) {
+    switch (value) {
+      case "English":
+        return 'en';
+      case 'Español':
+        return 'es';
+
+      case 'Français':
+        return 'fr';
+
+      case 'Deutsch':
+        return 'de';
+      default:
+        return 'en';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.language),
+    return ValueListenableBuilder(
+      valueListenable: langNotifier,
+      builder: (_, value, child) {
+        List<String> allStories = [
+          AppString.story1,
+          AppString.story2,
+          AppString.story3,
+          AppString.story4,
+          AppString.story5,
+          AppString.story6,
+          AppString.story7,
+          AppString.story8,
+          AppString.story9,
+          AppString.story10,
+        ];
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: Text(AppString.interestingStories),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.language),
+                onPressed: _showLanguageModal,
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  '${AppString.selectLanguage}: ${langNotifier.value}',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: allStories.length,
+                  itemBuilder: (context, index) {
+                    String story = allStories[index];
+                    return ListTile(
+                      title: Text(story),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
             onPressed: _showLanguageModal,
+            tooltip: AppString.selectLanguage,
+            child: const Icon(Icons.language),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              '${AppString.selectLanguage}: $_selectedLanguage',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: allStories.length,
-              itemBuilder: (context, index) {
-                String story = allStories[index];
-                return ListTile(
-                  title: Text(story),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showLanguageModal,
-        tooltip: AppString.selectLanguage,
-        child: const Icon(Icons.language),
-      ),
+        );
+      },
     );
   }
 }
